@@ -1,6 +1,6 @@
 import "dotenv/config";
 import Fastify from "fastify";
-import { env } from "./config";
+import { env } from "./config.js";
 
 const app = Fastify({ logger: true });
 
