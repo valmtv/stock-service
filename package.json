@@ -8,7 +8,8 @@
     "lint": "eslint src/**/*.ts --fix",
     "format": "prettier --write .",
     "dev": "cross-env tsx src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -39,9 +40,18 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,yaml,yml,md}": "prettier --write"
   }
 }
