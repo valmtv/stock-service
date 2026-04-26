@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx src/server.ts"
+    "dev": "cross-env tsx src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
+    "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.10",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"

@@ -1,5 +1,6 @@
 import "dotenv/config";
 import Fastify from "fastify";
+import { env } from "./config";
 
 const app = Fastify({ logger: true });
 
@@ -7,4 +8,7 @@ app.get("/", async () => {
   return { status: "ok" };
 });
 
-app.listen({ port: 3000, host: "0.0.0.0" });
+app.listen({
+  port: Number(env.PORT),
+  host: "0.0.0.0",
+});
