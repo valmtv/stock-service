@@ -35,7 +35,7 @@ Override port:
 PORT=4000 npm run dev
 ```
 
-Service runs at `http://localhost:PORT`.
+Service runs at `http://localhost:3000` by default, or `http://localhost:<PORT>` when `PORT` is set.
 
 ## Environment Variables
 
