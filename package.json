@@ -8,6 +8,8 @@
     "lint": "eslint src/**/*.ts --fix",
     "format": "prettier --write .",
     "dev": "cross-env tsx src/server.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
