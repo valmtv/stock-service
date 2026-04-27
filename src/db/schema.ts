@@ -1,5 +1,7 @@
-import { pgTable, text, integer, timestamp, primaryKey, check } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, timestamp, primaryKey, check, pgEnum } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+
+export const auditTypeEnum = pgEnum('audit_type', ['buy', 'sell']);
 
 export const wallets = pgTable('wallets', {
   id: text('id').primaryKey(),
@@ -31,8 +33,10 @@ export const walletStocks = pgTable(
 
 export const auditLog = pgTable('audit_log', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  type: text('type').notNull(), // "buy" | "sell"
-  walletId: text('wallet_id').notNull(),
+  type: auditTypeEnum('type').notNull(),
+  walletId: text('wallet_id')
+    .notNull()
+    .references(() => wallets.id),
   stockName: text('stock_name').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
