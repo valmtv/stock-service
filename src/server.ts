@@ -1,7 +1,11 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
 import { env } from './config.js';
-import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
+import {
+  serializerCompiler,
+  validatorCompiler,
+  jsonSchemaTransform,
+} from 'fastify-type-provider-zod';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
@@ -23,6 +27,7 @@ app.register(fastifySwagger, {
       version: '1.0.0',
     },
   },
+  transform: jsonSchemaTransform,
 });
 
 app.register(fastifySwaggerUi, {
