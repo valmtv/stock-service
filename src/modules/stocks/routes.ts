@@ -1,36 +1,36 @@
-import type { FastifyPluginCallback } from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { db } from '../../db/client.js';
 import { bankStocks } from '../../db/schema.js';
-import { getStocksResponseSchema, postStocksBodySchema, successResponseSchema } from './schema.js';
+import { getStocksRouteSchema, postStocksRouteSchema } from './schema.js';
 
-export const stockRoutes: FastifyPluginCallback = (fastify, _opts, done) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
-
-  app.get('/', { schema: { response: { 200: getStocksResponseSchema } } }, async (_, reply) => {
+// eslint-disable-next-line @typescript-eslint/require-await -- Fastify async plugin forces async to be used
+export const stocksRoutes: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.get('/', { schema: getStocksRouteSchema }, async (request, reply) => {
     const records = await db.select().from(bankStocks);
-    const stocks = records.map((r) => ({ name: r.stockName, quantity: r.quantity }));
-    return reply.send({ stocks });
+
+    const stocks = records.map((record) => ({
+      name: record.stockName,
+      quantity: record.quantity,
+    }));
+
+    return reply.status(200).send({ stocks });
   });
 
-  app.post(
-    '/',
-    { schema: { body: postStocksBodySchema, response: { 200: successResponseSchema } } },
-    async (request, reply) => {
-      const { stocks } = request.body;
+  fastify.post('/', { schema: postStocksRouteSchema }, async (request, reply) => {
+    const { stocks } = request.body;
 
-      await db.transaction(async (tx) => {
-        await tx.delete(bankStocks);
-        if (stocks.length > 0) {
-          await tx
-            .insert(bankStocks)
-            .values(stocks.map((s) => ({ stockName: s.name, quantity: s.quantity })));
-        }
-      });
+    await db.transaction(async (tx) => {
+      await tx.delete(bankStocks);
 
-      return reply.send({ success: true });
-    },
-  );
+      if (stocks.length > 0) {
+        const insertData = stocks.map((stock) => ({
+          stockName: stock.name,
+          quantity: stock.quantity,
+        }));
+        await tx.insert(bankStocks).values(insertData);
+      }
+    });
 
-  done();
+    return reply.status(200).send({ success: true });
+  });
 };

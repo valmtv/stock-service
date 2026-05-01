@@ -10,7 +10,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 
-import { stockRoutes } from './modules/stocks/routes.js';
+import { stocksRoutes } from './modules/stocks/routes.js';
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
@@ -34,7 +34,7 @@ app.register(fastifySwaggerUi, {
   routePrefix: '/docs',
 });
 
-app.register(stockRoutes, { prefix: '/stocks' });
+app.register(stocksRoutes, { prefix: '/stocks' });
 
 app.get('/health', () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
