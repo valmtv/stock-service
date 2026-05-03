@@ -19,3 +19,25 @@ export const postWalletsRouteSchema = {
     500: errorResponseSchema,
   },
 };
+
+export const getWalletParamsSchema = z.object({
+  wallet_id: z.string().describe('ID of the wallet'),
+});
+
+export const getWalletRouteSchema = {
+  description: 'Returns the current state of the particular wallet',
+  tags: ['Wallets'],
+  params: getWalletParamsSchema,
+  response: {
+    200: z.object({
+      id: z.string(),
+      stocks: z.array(
+        z.object({
+          name: z.string(),
+          quantity: z.number().int(),
+        }),
+      ),
+    }),
+    404: errorResponseSchema,
+  },
+};
