@@ -12,6 +12,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 
 import { stocksRoutes } from './modules/stocks/routes.js';
 import { walletsRoutes } from './modules/wallets/routes.js';
+import { logRoutes } from './modules/log/routes.js';
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
@@ -37,6 +38,7 @@ app.register(fastifySwaggerUi, {
 
 app.register(stocksRoutes, { prefix: '/stocks' });
 app.register(walletsRoutes, { prefix: '/wallets' });
+app.register(logRoutes, { prefix: '/log' }); // /log to match the requirements
 
 app.get('/health', () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
