@@ -98,48 +98,32 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
             .where(eq(bankStocks.stockName, stock_name))
             .limit(1);
 
-          const bankStock = bankStockRecords[0];
-
-          if (!bankStock) {
+          if (!bankStockRecords[0]) {
             throw new HttpError(404, 'Stock does not exist in the bank');
           }
 
           if (type === 'buy') {
-            if (bankStock.quantity <= 0) {
+            // Decrement bank
+            const updatedBank = await tx
+              .update(bankStocks)
+              .set({ quantity: sql`${bankStocks.quantity} - 1` })
+              .where(and(eq(bankStocks.stockName, stock_name), sql`${bankStocks.quantity} > 0`))
+              .returning();
+
+            if (updatedBank.length === 0) {
               throw new HttpError(400, 'No stock available in the bank to buy');
             }
 
             await tx.insert(wallets).values({ id: wallet_id }).onConflictDoNothing();
 
-            // Decrement bank
-            await tx
-              .update(bankStocks)
-              .set({ quantity: sql`${bankStocks.quantity} - 1` })
-              .where(eq(bankStocks.stockName, stock_name));
-
             // Increment wallet
-            const existingWalletStockRecords = await tx
-              .select()
-              .from(walletStocks)
-              .where(
-                and(eq(walletStocks.walletId, wallet_id), eq(walletStocks.stockName, stock_name)),
-              )
-              .limit(1);
-
-            const existingWalletStock = existingWalletStockRecords[0];
-
-            if (existingWalletStock) {
-              await tx
-                .update(walletStocks)
-                .set({ quantity: sql`${walletStocks.quantity} + 1` })
-                .where(
-                  and(eq(walletStocks.walletId, wallet_id), eq(walletStocks.stockName, stock_name)),
-                );
-            } else {
-              await tx
-                .insert(walletStocks)
-                .values({ walletId: wallet_id, stockName: stock_name, quantity: 1 });
-            }
+            await tx
+              .insert(walletStocks)
+              .values({ walletId: wallet_id, stockName: stock_name, quantity: 1 })
+              .onConflictDoUpdate({
+                target: [walletStocks.walletId, walletStocks.stockName],
+                set: { quantity: sql`${walletStocks.quantity} + 1` },
+              });
           } else if (type === 'sell') {
             const walletRecords = await tx
               .select()
@@ -151,27 +135,22 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
               throw new HttpError(400, 'Wallet does not exist');
             }
 
-            const walletStockRecords = await tx
-              .select()
-              .from(walletStocks)
-              .where(
-                and(eq(walletStocks.walletId, wallet_id), eq(walletStocks.stockName, stock_name)),
-              )
-              .limit(1);
-
-            const walletStock = walletStockRecords[0];
-
-            if (!walletStock || walletStock.quantity <= 0) {
-              throw new HttpError(400, 'No stock in the wallet to sell');
-            }
-
             // Decrement wallet
-            await tx
+            const updatedWallet = await tx
               .update(walletStocks)
               .set({ quantity: sql`${walletStocks.quantity} - 1` })
               .where(
-                and(eq(walletStocks.walletId, wallet_id), eq(walletStocks.stockName, stock_name)),
-              );
+                and(
+                  eq(walletStocks.walletId, wallet_id),
+                  eq(walletStocks.stockName, stock_name),
+                  sql`${walletStocks.quantity} > 0`,
+                ),
+              )
+              .returning();
+
+            if (updatedWallet.length === 0) {
+              throw new HttpError(400, 'No stock in the wallet to sell');
+            }
 
             // Increment bank
             await tx
@@ -180,7 +159,7 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
               .where(eq(bankStocks.stockName, stock_name));
           }
 
-          // Log the successful operation inside the transaction
+          // Log the successful operation
           await tx.insert(auditLog).values({
             type: type,
             walletId: wallet_id,
