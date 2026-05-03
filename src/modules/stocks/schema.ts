@@ -19,6 +19,7 @@ export const getStocksRouteSchema = {
   tags: ['Stocks'],
   response: {
     200: getStocksResponseSchema,
+    500: errorResponseSchema,
   },
 };
 

@@ -13,5 +13,8 @@ export const getLogRouteSchema = {
         }),
       ),
     }),
+    500: z.object({
+      error: z.string(),
+    }),
   },
 };

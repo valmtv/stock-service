@@ -40,6 +40,7 @@ export const getWalletRouteSchema = {
       ),
     }),
     404: errorResponseSchema,
+    500: errorResponseSchema,
   },
 };
 
@@ -55,6 +56,7 @@ export const getWalletStockRouteSchema = {
   params: walletStockParamsSchema,
   response: {
     200: z.number().int(),
+    500: errorResponseSchema,
   },
 };
 
@@ -69,5 +71,6 @@ export const postWalletStockRouteSchema = {
     200: z.object({ success: z.boolean() }),
     400: errorResponseSchema,
     404: errorResponseSchema,
+    500: errorResponseSchema,
   },
 };
