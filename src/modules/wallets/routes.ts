@@ -71,12 +71,8 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
 
       const stock = stockRecords[0];
 
-      if (!stock || stock.quantity === 0) {
-        return reply.status(404).send({
-          statusCode: 404,
-          error: 'Not Found',
-          message: 'Stock not found in wallet',
-        });
+      if (!stock) {
+        return reply.status(200).send(0);
       }
 
       return reply.status(200).send(stock.quantity);
