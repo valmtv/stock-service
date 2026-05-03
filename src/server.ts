@@ -47,8 +47,8 @@ app.get('/health', () => {
 const start = async () => {
   try {
     await app.listen({ port: Number(env.PORT), host: '0.0.0.0' });
-    console.log(`Server listening on http://localhost:${env.PORT}`);
-    console.log(`Swagger Docs available at http://localhost:${env.PORT}/docs`);
+    app.log.info(`Server listening on http://localhost:${env.PORT}`);
+    app.log.info(`Swagger Docs available at http://localhost:${env.PORT}/docs`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);
