@@ -43,7 +43,7 @@ export const getWalletRouteSchema = {
   },
 };
 
-export const WalletStockParamsSchema = z.object({
+export const walletStockParamsSchema = z.object({
   wallet_id: z.string().describe('ID of the wallet'),
   stock_name: z.string().describe('Name of the stock'),
 });
@@ -52,7 +52,7 @@ export const getWalletStockRouteSchema = {
   description:
     'Returns quantity of the specified stock in the specified wallet. If no wallet/stock record exists, returns 200 with quantity 0.',
   tags: ['Wallets'],
-  params: WalletStockParamsSchema,
+  params: walletStockParamsSchema,
   response: {
     200: z.number().int(),
   },
@@ -61,7 +61,7 @@ export const getWalletStockRouteSchema = {
 export const postWalletStockRouteSchema = {
   description: 'Simulates sell or buy of a single stock',
   tags: ['Wallets'],
-  params: WalletStockParamsSchema,
+  params: walletStockParamsSchema,
   body: z.object({
     type: z.enum(['buy', 'sell']),
   }),
