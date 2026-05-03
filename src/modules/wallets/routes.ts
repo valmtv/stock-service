@@ -51,13 +51,11 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         quantity: walletStocks.quantity,
       })
       .from(walletStocks)
-      .where(eq(walletStocks.walletId, wallet_id));
-
-    const filteredStocks = stocksRecords.filter((stock) => stock.quantity > 0);
+      .where(and(eq(walletStocks.walletId, wallet_id), sql`${walletStocks.quantity} > 0`));
 
     return reply.status(200).send({
       id: wallet_id,
-      stocks: filteredStocks,
+      stocks: stocksRecords,
     });
   });
 
