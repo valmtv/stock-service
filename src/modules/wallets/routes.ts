@@ -25,7 +25,7 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         const insertData = newWallets.map((wallet) => ({
           id: wallet.id,
         }));
-        await tx.insert(wallets).values(insertData);
+        await tx.insert(wallets).values(insertData).onConflictDoNothing();
       }
     });
 
