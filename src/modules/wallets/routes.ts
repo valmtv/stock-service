@@ -153,10 +153,15 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
             }
 
             // Increment bank
-            await tx
+            const updatedBank = await tx
               .update(bankStocks)
               .set({ quantity: sql`${bankStocks.quantity} + 1` })
-              .where(eq(bankStocks.stockName, stock_name));
+              .where(eq(bankStocks.stockName, stock_name))
+              .returning();
+
+            if (updatedBank.length === 0) {
+              throw new HttpError(500, 'Failed to return stock to the bank');
+            }
           }
 
           // Log the successful operation
