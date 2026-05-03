@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
+import cluster from 'node:cluster';
+import process from 'node:process';
 import { env } from './config.js';
 import {
   serializerCompiler,
@@ -44,6 +46,10 @@ app.get('/health', () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
+app.post('/chaos', () => {
+  process.exit(1);
+});
+
 const start = async () => {
   try {
     await app.listen({ port: Number(env.PORT), host: '0.0.0.0' });
@@ -55,4 +61,14 @@ const start = async () => {
   }
 };
 
-await start();
+if (cluster.isPrimary) {
+  for (let i = 0; i < 2; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', () => {
+    cluster.fork();
+  });
+} else {
+  await start();
+}
