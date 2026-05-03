@@ -41,3 +41,18 @@ export const getWalletRouteSchema = {
     404: errorResponseSchema,
   },
 };
+
+export const getWalletStockParamsSchema = z.object({
+  wallet_id: z.string().describe('ID of the wallet'),
+  stock_name: z.string().describe('Name of the stock'),
+});
+
+export const getWalletStockRouteSchema = {
+  description: 'Returns quantity of the specified stock in the specified wallet',
+  tags: ['Wallets'],
+  params: getWalletStockParamsSchema,
+  response: {
+    200: z.number().int(),
+    404: errorResponseSchema,
+  },
+};

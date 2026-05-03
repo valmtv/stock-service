@@ -1,9 +1,13 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import { db } from '../../db/client.js';
 import { wallets, walletStocks } from '../../db/schema.js';
-import { getWalletRouteSchema, postWalletsRouteSchema } from './schema.js';
+import {
+  getWalletRouteSchema,
+  getWalletStockRouteSchema,
+  postWalletsRouteSchema,
+} from './schema.js';
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
@@ -52,4 +56,30 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       stocks: filteredStocks,
     });
   });
+
+  fastify.get(
+    '/:wallet_id/stocks/:stock_name',
+    { schema: getWalletStockRouteSchema },
+    async (request, reply) => {
+      const { wallet_id, stock_name } = request.params;
+
+      const stockRecords = await db
+        .select({ quantity: walletStocks.quantity })
+        .from(walletStocks)
+        .where(and(eq(walletStocks.walletId, wallet_id), eq(walletStocks.stockName, stock_name)))
+        .limit(1); // Informational only
+
+      const stock = stockRecords[0];
+
+      if (!stock || stock.quantity === 0) {
+        return reply.status(404).send({
+          statusCode: 404,
+          error: 'Not Found',
+          message: 'Stock not found in wallet',
+        });
+      }
+
+      return reply.status(200).send(stock.quantity);
+    },
+  );
 };
