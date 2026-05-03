@@ -17,6 +17,8 @@ export const walletsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     const { wallets: newWallets } = request.body;
 
     await db.transaction(async (tx) => {
+      await tx.delete(auditLog);
+      await tx.delete(walletStocks);
       await tx.delete(wallets);
 
       if (newWallets.length > 0) {

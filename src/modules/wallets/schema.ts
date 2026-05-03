@@ -10,7 +10,8 @@ export const postWalletsBodySchema = z.object({
 });
 
 export const postWalletsRouteSchema = {
-  description: 'Sets the current state of all wallets (overwrites existing state)',
+  description:
+    'Sets the current state of wallets AND cleans all stocks in wallets and audit log (overwrites existing state)',
   tags: ['Wallets'],
   body: postWalletsBodySchema,
   response: {
