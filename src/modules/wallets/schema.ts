@@ -49,12 +49,12 @@ export const WalletStockParamsSchema = z.object({
 });
 
 export const getWalletStockRouteSchema = {
-  description: 'Returns quantity of the specified stock in the specified wallet',
+  description:
+    'Returns quantity of the specified stock in the specified wallet. If no wallet/stock record exists, returns 200 with quantity 0.',
   tags: ['Wallets'],
   params: WalletStockParamsSchema,
   response: {
     200: z.number().int(),
-    404: errorResponseSchema,
   },
 };
 
