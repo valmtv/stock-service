@@ -20,7 +20,7 @@ npm install
 start.bat <PORT>
 ```
 
-Both scripts spin up the Postgres container, apply migrations, and start the server. The service will be available at `http://localhost:<PORT>`.
+Both scripts spin up the Postgres container, push the schema, and start the server. The service will be available at `http://localhost:<PORT>`.
 
 ## Requirements
 

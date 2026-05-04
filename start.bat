@@ -9,9 +9,6 @@ if "%~1"=="" (
 
 set PORT=%~1
 
-echo Installing dependencies...
-call npm install
-
 echo Starting infrastructure...
 docker compose up -d db
 
